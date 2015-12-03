@@ -2,6 +2,7 @@ package com.grizzlypenguins.dungeondart;
 
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.util.Log;
 
 import java.io.Serializable;
 
@@ -12,11 +13,11 @@ import java.io.Serializable;
 public class CameraControl implements Serializable {
 
 
-    //scaleX and scaleY are the player location in the bitmap
+    //scaleX and scaleY are for zooming the surfaceview inorder to display myFactory.TILENUMBER tiles
     double scaleX;
     double scaleY;
-    public double tileSize;
-    LevelMap levelMap;
+   // public double tileSize;
+    //LevelMap levelMap;
 
     //player position
     public MyPoint player_position;
@@ -25,7 +26,7 @@ public class CameraControl implements Serializable {
     public int boost=0;
 
     //Displaying Tiles
-    Tile [][] tiles;
+    public Tile [][] tiles;
 
     //moving information
     public boolean move_left= false;
@@ -34,11 +35,12 @@ public class CameraControl implements Serializable {
     public boolean move_down = false;
     public boolean moved = false;
 
+    //num
     int num = myFactory.TILENUMBER/2;
 
 
     public CameraControl(double scaleX, double scaleY,double Ts,MyPoint poz,int playerMovement) {
-        tileSize = myFactory.TILESIZE;
+      //  tileSize = myFactory.TILESIZE;
         speed = playerMovement;
         this.playerMovement = 0;
         player_position = new MyPoint(poz.x,poz.y);
@@ -67,7 +69,7 @@ public class CameraControl implements Serializable {
 
     boolean movableTile(Tile t)
     {
-        if(t.define>0)
+        if(t.getDefine()>0)
             return true;
         else
             return false;
@@ -138,6 +140,18 @@ public class CameraControl implements Serializable {
 
 
     }
+    public void preMonsterRender()
+    {
+        if(tiles!=null)
+        {
+            for(int i=0;i<myFactory.TILENUMBER;i++)
+            {
+                for(int y=0;y<myFactory.TILENUMBER;y++) {
+                    tiles[i][y].monster = false;
+                }
+            }
+        }
+    }
 
     public void render (Canvas c) throws Exception {
        if(moved) {
@@ -151,7 +165,9 @@ public class CameraControl implements Serializable {
         for(int i=0;i<myFactory.TILENUMBER;i++)
         {
             for(int y=0;y<myFactory.TILENUMBER;y++) {
-                tiles[i][y].render(c, (float) (i * tileSize), (float) (y * tileSize));
+               if(c != null) tiles[i][y].render(c, (float) (i * myFactory.TILESIZE), (float) (y * myFactory.TILESIZE));
+                else
+                   Log.v("CameraControl","The canvas is null idiot");
             }
         }
     }

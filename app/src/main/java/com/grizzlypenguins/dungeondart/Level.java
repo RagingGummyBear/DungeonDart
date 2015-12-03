@@ -60,9 +60,8 @@ public class Level implements Runnable{
         cameraZoom =  (float)screenSize / (float)(myFactory.TILESIZE * myFactory.TILENUMBER);
 
         cameraControl = new CameraControl(cameraZoom,cameraZoom,myFactory.TILESIZE,levelMap.start,difficulty.playerSpeed);
-        cameraControl.levelMap = levelMap;
+        //cameraControl.levelMap = levelMap;
         cameraControl.tiles = levelMap.getShowingTiles(levelMap.start);
-
 
         // CreateMonster
         EvilMonster evilMonster = new EvilMonster(myFactory.getInstance().get_MovementMap(levelMap.tiles),levelMap.monsterStart,levelMap.start,difficulty.monsterSpeed);

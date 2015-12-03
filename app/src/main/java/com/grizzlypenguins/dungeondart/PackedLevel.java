@@ -50,11 +50,8 @@ public class PackedLevel implements Serializable {
         torchLight.tick();
         evilMonster.playerLocation = cameraControl.player_position;
 
-
           // gameFinished = true;
            //mainCharacter.alive = false;
-
-       levelMap.tiles[evilMonster.location.x][evilMonster.location.y].monster = true;
         mainCharacter.tick();
         Tile temp = cameraControl.tick();
        if(temp !=null )
@@ -82,7 +79,7 @@ public class PackedLevel implements Serializable {
         }
        cameraControl.calculateShadow((int) Math.floor(torchLight.intensity));
 
-      if(temp!=null) if(temp.define == 5){
+      if(temp!=null) if(temp.getDefine() == 5){
            gameFinished = true;
        }
 
@@ -91,6 +88,8 @@ public class PackedLevel implements Serializable {
     public void render (Canvas c)
     {
         try{
+            cameraControl.preMonsterRender();
+            levelMap.tiles[evilMonster.location.x][evilMonster.location.y].monster = true;
             cameraControl.render(c);
         }
         catch (Exception e)

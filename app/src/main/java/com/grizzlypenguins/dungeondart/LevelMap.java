@@ -12,11 +12,14 @@ import java.util.Collections;
  */
 public class LevelMap implements Serializable {
 
+    // table fields
+    private int _id;
+    private String mapName;
+    private int _userid; // foreign key
 
-    public String mapName;
     public Tile tiles [][];  //tile [height][width]
 
-   //public int tileNumber;
+    //public int tileNumber;
     boolean generatedMap = false;
 
     ArrayList<MyPoint> starts = new ArrayList<MyPoint>();    // start tiles
@@ -26,9 +29,52 @@ public class LevelMap implements Serializable {
     MyPoint end = new MyPoint(1,1);
     MyPoint monsterStart = new MyPoint(1,1);
 
-    public  LevelMap (Tile Tiles [][],String mapName)
-    {
+    /*
+        added getters and setters
+     */
 
+    public int getId() {
+        return _id;
+    }
+
+    public void setId(int id) {
+        _id = id;
+    }
+
+    public String getMapName() {
+        return mapName;
+    }
+
+    public void setMapName(String mapname) {
+        mapName = mapname;
+    }
+
+    public int getUserId() {
+        return _userid;
+    }
+
+    public void setUserId(int userid) {
+        _userid = userid;
+    }
+
+    /*
+        end of added getters and setters
+     */
+
+    /*
+        added constructor
+     */
+    public LevelMap() {
+
+    }
+
+    /*
+        end of added constructor
+     */
+
+    public  LevelMap (Tile Tiles [][],String mapName,int _id)
+    {
+        this._id = _id;
         this.mapName = mapName;
         tiles = Tiles;
 
@@ -39,11 +85,18 @@ public class LevelMap implements Serializable {
 
     }
 
+    public  LevelMap (Tile Tiles [][],String mapName)
+    {
+        this.mapName = mapName;
+        tiles = Tiles;
+    }
+
     public LevelMap (LevelMap lm)
     {
 
         this.mapName = lm.mapName;
         this.tiles = lm.tiles;
+        this._id = lm._id;
         //this.width = lm.width;
         //this.tileNumber = lm.tileNumber;
         //this.height = lm.height;
@@ -63,17 +116,17 @@ public class LevelMap implements Serializable {
                     Log.v("LevelMap "," null tiles");
                     break;
                 }
-                if(tiles[i][y].define == 2)
+                if(tiles[i][y].getDefine() == 2)
                 {
                     // Implement the drawing of start and finish tiles
                     starts.add(new MyPoint(i, y));
 
                 }
-                if(tiles[i][y].define == 3)
+                if(tiles[i][y].getDefine() == 3)
                 {
                     finishs.add(new MyPoint(i, y));
                 }
-                if(tiles[i][y].define == 7)
+                if(tiles[i][y].getDefine() == 7)
                 {
                     monsterStarts.add(new MyPoint(i,y));
                 }
@@ -82,12 +135,12 @@ public class LevelMap implements Serializable {
 
         }
 
-       this.end = choose_End();
-       this.start = choose_Start();
+        this.end = choose_End();
+        this.start = choose_Start();
         this.monsterStart = choose_monsterStart();
         if(!checkStartAndEnd())
         {
-           // throw new Exception("Couldn't find suitable start or end");
+            // throw new Exception("Couldn't find suitable start or end");
         }
         this.generatedMap = true;
 
@@ -99,15 +152,15 @@ public class LevelMap implements Serializable {
         boolean good1= false ,good2 = false,good3 = false;
         for(int i=0;i<starts.size();i++)
         {
-                Tile [][]temp = this.getShowingTiles(starts.get(i));
-                if(temp!=null)
-                {
-                    good1 = true;
-                    start = starts.get(i);
-                    tiles[start.x][start.y].define=4;
-                    //System.out.println("Tile x: "+ start.x + " Tile y:"+start.y +" keyword: banana");
-                    break;
-                }
+            Tile [][]temp = this.getShowingTiles(starts.get(i));
+            if(temp!=null)
+            {
+                good1 = true;
+                start = starts.get(i);
+                tiles[start.x][start.y].setDefine(4);
+                //System.out.println("Tile x: "+ start.x + " Tile y:"+start.y +" keyword: banana");
+                break;
+            }
         }
         for(int i=0;i<finishs.size();i++)
         {
@@ -116,7 +169,7 @@ public class LevelMap implements Serializable {
             {
                 good2 = true;
                 end = finishs.get(i);
-                tiles[finishs.get(i).x][finishs.get(i).y].define = 5;
+                tiles[finishs.get(i).x][finishs.get(i).y].setDefine(5);
                 break;
             }
 
@@ -128,7 +181,7 @@ public class LevelMap implements Serializable {
             {
                 good3 = true;
                 monsterStart = monsterStarts.get(i);
-                tiles[monsterStarts.get(i).x][monsterStarts.get(i).y].define = 7;
+                tiles[monsterStarts.get(i).x][monsterStarts.get(i).y].setDefine(7);
                 break;
             }
 
@@ -145,7 +198,7 @@ public class LevelMap implements Serializable {
     MyPoint choose_End()
     {
         Collections.shuffle(finishs);
-       // for(int i=0;i<finishs.size();i++)tiles[finishs.get(i).x][finishs.get(i).y].define = 6;
+        // for(int i=0;i<finishs.size();i++)tiles[finishs.get(i).x][finishs.get(i).y].getDefine() = 6;
         return finishs.get(0);
     }
 
@@ -170,14 +223,14 @@ public class LevelMap implements Serializable {
             for(int z=0;z<myFactory.TILENUMBER;z++)
             {
 
-               if(x+i<tiles.length-5 && y+z<tiles.length-5&& x+i >5 && y+z > 5) {
-                   tiles[x + i][y + z].monster = false;
-                   temp[i][z] = this.tiles[x + i][y + z];
+                if(x+i<tiles.length-5 && y+z<tiles.length-5&& x+i >5 && y+z > 5) {
+                   // tiles[x + i][y + z].monster = false;
+                    temp[i][z] = this.tiles[x + i][y + z];
 
-               }
+                }
                 else{
                     System.out.println("The location of the nulls x: " + x + " y:" + y + "  i:" + i + "  z: " +z);
-                   return null;
+                    return null;
                 }
             }
         }

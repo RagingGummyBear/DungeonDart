@@ -33,7 +33,7 @@ public class myFactory {
 
     public Bitmap Character;
     public Bitmap EvilMonster;
-    public MonsetNextStep monsetNextStep;
+    public MonsetNextStep monsetNextStep;  //pathfinding algo
 
     public Bitmap PowerUpR; //speed
     public Bitmap PowerUpB; //torchHealth
@@ -89,20 +89,20 @@ public class myFactory {
         tiles[12][12] = newStartTile();
         tiles[tileNum-12][tileNum-12] = newMonsterDenTile();
         tiles[13][12] = newFinishTile();
-        return new LevelMap(tiles,"test_map_4");
+        return new LevelMap(tiles,"test_map_4",10004);
     }
 
     public LevelMap test_map_3()
     {
         int tileNum = 100;
         //(Tile Tiles [][],int tileNumber, int TileSize,String mapName)
-        LevelMap temp=new LevelMap(test_Tiles_1(tileNum),"TestMap3");
+        LevelMap temp=new LevelMap(test_Tiles_1(tileNum),"TestMap3",10003);
         for(int i=10;i<90;i++)
         {
             for(int y=10;y<90;y++)
-            if(temp.tiles[i][y].define==0)temp.tiles[i][y].define=1;
+            if(temp.tiles[i][y].getDefine()==0)temp.tiles[i][y].setDefine(1);
         }
-        temp.tiles[11][11].define = 7;
+        temp.tiles[11][11].setDefine(7);
         return temp;
     }
 
@@ -110,7 +110,7 @@ public class myFactory {
     {
         int tileNum = 120;
         //(Tile Tiles [][],int tileNumber, int TileSize,String mapName)
-        return new LevelMap(test_Tiles_1(tileNum),"TestMap1");
+        return new LevelMap(test_Tiles_1(tileNum),"TestMap1",10001);
     }
 
     public Tile test_tile_1()
@@ -140,16 +140,28 @@ public class myFactory {
     //defines the tile with : 0 wall,1 movable,2 start,3 finish, 4 choosenStart,5 working exit, 6 not working exit, 7 monsterDen
     public Tile newStartTile()
     {
-        return new Tile(3,Rand.getInstance().random.nextInt(10),Rand.getInstance().random.nextInt(10));
+        return new Tile(2,0,0);
     }
 
     public Tile newFinishTile()
     {
-        return new Tile(4,Rand.getInstance().random.nextInt(10),Rand.getInstance().random.nextInt(10));
+        return new Tile(3,0,0);
     }
     public Tile newMovableTile()
     {
-        return new Tile(1,Rand.getInstance().random.nextInt(20),Rand.getInstance().random.nextInt(20));
+        return new Tile(1,0,0);
+    }
+    public Tile newPowerUpTile()
+    {
+        return new Tile(1,Rand.getInstance().random.nextInt(4),0);
+    }
+    public Tile newTrapTile()
+    {
+        return new Tile(1,0,Rand.getInstance().random.nextInt(4));
+    }
+    public Tile newTrapAndPowerUpTile()
+    {
+       return new Tile(1,Rand.getInstance().random.nextInt(4),Rand.getInstance().random.nextInt(4));
     }
 
     public Tile newMonsterDenTile()
@@ -166,7 +178,7 @@ public class myFactory {
     {
         int tileNum = i;
         //(Tile Tiles [][],int tileNumber, int TileSize,String mapName)
-        return new LevelMap(test_Tiles_2(tileNum),"TestMap2");
+        return new LevelMap(test_Tiles_2(tileNum),"TestMap2",10002);
     }
 
     public Tile[][] test_Tiles_2(int tileNumber)
@@ -191,21 +203,21 @@ public class myFactory {
         while(true) {
             x = Rand.random.nextInt((tileNumber- 20) + 1) + 20;
             y = Rand.random.nextInt((tileNumber - 20) + 1) + 20;
-            if (temp[x][y].define < 3) {
+            if (temp[x][y].getDefine() < 3) {
                 temp[x][y] = newStartTile();
                 break;
             }
         }  while(true) {
         x = Rand.random.nextInt((tileNumber- 20) + 1) + 20;
         y = Rand.random.nextInt((tileNumber - 20) + 1) + 20;
-        if (temp[x][y].define < 3) {
+        if (temp[x][y].getDefine() < 3) {
             temp[x][y] = newFinishTile();
             break;
         }
     }  while(true) {
         x = Rand.random.nextInt((tileNumber- 20) + 1) + 20;
         y = Rand.random.nextInt((tileNumber - 20) + 1) + 20;
-        if (temp[x][y].define < 3) {
+        if (temp[x][y].getDefine() < 3) {
             temp[x][y] = newMonsterDenTile();
             break;
         }
@@ -305,9 +317,6 @@ public class myFactory {
         {
             EvilMonster = getResizedBitmap(EvilMonster,myFactory.TILESIZE,myFactory.TILESIZE);
         }
-
-
-
     }
 
     public int [][] get_MovementMap(Tile [][]tiles)
@@ -318,7 +327,7 @@ public class myFactory {
         {
             for(int y=0;y<tiles[0].length;y++)
             {
-                temp[i][y]= tiles[i][y].define;
+                temp[i][y]= tiles[i][y].getDefine();
             }
         }
         return temp;
@@ -349,6 +358,89 @@ public class myFactory {
     public PowerUpTorchHealth newPowerUpTorchHealth() {
         return new PowerUpTorchHealth(1,"PowerUpTorchHealth",false);
     }
+
+    public Tile getTileOfType(String s)
+    {
+        Tile temp;
+        switch (s)
+        {
+            case "movabletile":
+            {
+                return this.newMovableTile();
+            }
+            case "notmovabletile":
+            {
+                return this.newWallTile();
+            }
+            case "finishtile":
+            {
+                return this.newFinishTile();
+            }
+            case "starttile":
+            {
+                return  this.newStartTile();
+            }
+            case "monsterstarttile":
+            {
+                return this.newMonsterDenTile();
+            }
+            case "poweruptile":
+            {
+                return newPowerUpTile();
+            }
+            case "traptile":
+            {
+                return newTrapTile();
+            }
+            case "powerupandtraptile":
+            {
+                return newTrapAndPowerUpTile();
+            }
+            default:return null;
+
+        }
+    }
+
+    public LevelMap newBlankMovableMap(int width,int height,String mapname)
+    {
+
+        width+=20;
+        height+=20;
+        Tile [][]tiles =new Tile [height][width];
+        for(int i=0;i<height;i++)
+        {
+            for(int y=0;y<width;y++) {
+                if (i < 10 || i > height - 10 || y < 10 || y > width - 10) {
+                    tiles[i][y] = newWallTile();
+                } else {
+                    tiles[i][y] = newMovableTile();
+                }
+                tiles[i][y].setX(i);
+                tiles[i][y].setY(y);
+            }
+        }
+        return new LevelMap(tiles,mapname,2000);
+
+    }
+    public LevelMap newBlankNotMovableMap(int width,int height,String mapname)
+    {
+
+        width+=20;
+        height+=20;
+        Tile [][]tiles =new Tile [height][width];
+        for(int i=0;i<height;i++)
+        {
+            for(int y=0;y<width;y++)
+            {
+                tiles[i][y] = newWallTile();
+                tiles[i][y].setX(i);
+                tiles[i][y].setY(y);
+            }
+        }
+        return new LevelMap(tiles,mapname,3000);
+
+    }
+
 
 
 }

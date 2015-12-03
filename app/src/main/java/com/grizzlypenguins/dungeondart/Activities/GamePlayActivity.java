@@ -2,7 +2,6 @@ package com.grizzlypenguins.dungeondart.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,17 +11,13 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.grizzlypenguins.dungeondart.PackedLevel;
 import com.grizzlypenguins.dungeondart.R;
-
-import java.util.TimerTask;
 
 public class GamePlayActivity extends Activity implements SensorEventListener {
 
@@ -93,10 +88,12 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
     {
         level = (PackedLevel) getIntent().getSerializableExtra("PackedLevel");
         gamePanel = (GamePanel) findViewById(R.id.GamePanel);
+
         move_up = (Button)findViewById(R.id.moveUp);
         move_down = (Button)findViewById(R.id.moveDown);
-        move_left = (Button)findViewById(R.id.moveLeft);
+        move_left = (Button)findViewById(R.id.moveRight);
         move_right = (Button)findViewById(R.id.moveRight);
+
         gamePanel.level = level;
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         lastUpdate = System.currentTimeMillis();

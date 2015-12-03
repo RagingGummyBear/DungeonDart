@@ -9,29 +9,43 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.grizzlypenguins.dungeondart.Difficulty;
 import com.grizzlypenguins.dungeondart.Level;
+import com.grizzlypenguins.dungeondart.LevelMap;
 import com.grizzlypenguins.dungeondart.PlayerScoring;
 import com.grizzlypenguins.dungeondart.R;
+import com.grizzlypenguins.dungeondart.ScrollViewPackage.ListElementAdapter;
+import com.grizzlypenguins.dungeondart.ScrollViewPackage.ListInput;
 import com.grizzlypenguins.dungeondart.myFactory;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class MainMenu extends Activity {
 
     RelativeLayout mainScreen;
     FrameLayout createGameScreen;
     RelativeLayout scoreScreen;
+    FrameLayout createMapScreen;
 
+    ListView mapView;
+    ArrayList<ListInput> mapList = new ArrayList<ListInput>();
 
     Button newGame;
     Button exitGame;
     Button startGame;
     Button back;
-    Button okScore;
+    Button okScore,howToPlay,google;
+    Button backCreateMap;
+    Button nextCreateMap;
 
     TextView timePlayed;
     TextView scoredPoints;
@@ -39,6 +53,8 @@ public class MainMenu extends Activity {
     RatingBar ratingBar;
     Level startNewLevel;
     Window window;
+
+    LevelMap pickedMapLevel;
 
     MainMenuSettings mainMenuSettings;
 
@@ -50,8 +66,42 @@ public class MainMenu extends Activity {
 
         initialize();
         set_listeners();
+
+        //TEST MAPS
+        //should remove these
+        LevelMap temp = myFactory.getInstance().test_map_1();
+        mapList.add(new ListInput(temp.getMapName(), 0, temp.getId()));
+        temp = myFactory.getInstance().test_map_2(200);
+        mapList.add(new ListInput(temp.getMapName(), 0, temp.getId()));
+        temp = myFactory.getInstance().test_map_3();
+        mapList.add(new ListInput(temp.getMapName(), 0, temp.getId()));
+        temp = myFactory.getInstance().test_map_4();
+        ListInput temp2 = new ListInput(temp.getMapName(), 0, temp.getId());
+        this.add_map(temp2);
         window = this.getWindow();
 
+    }
+    public void GoogleLoging(View v){
+        Intent ab = new Intent(MainMenu.this,GoogleLogin.class);
+        startActivity(ab);
+    }
+    public void promeni(View v){
+        Intent ab = new Intent(MainMenu.this,How_to_Play.class);
+        startActivity(ab);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        pickedMapLevel = null;
+    }
+
+    public void createMapButtonPressed(View v){
+                mainMenuSettings.mainmenu = false;
+                mainMenuSettings.scoreScreen = false;
+                mainMenuSettings.newGameScree = false;
+                mainMenuSettings.createMapScreen = true;
+                toggle_layout();
     }
 
     private void initialize() {
@@ -61,6 +111,7 @@ public class MainMenu extends Activity {
         mainScreen = (RelativeLayout)findViewById(R.id.firstScreen);
         createGameScreen = (FrameLayout)findViewById(R.id.createGameScreen);
         scoreScreen = (RelativeLayout)findViewById(R.id.scoreScreenLayout);
+        createMapScreen = (FrameLayout) findViewById(R.id.createMapScreen);
 
         newGame = (Button)findViewById(R.id.newGameButton);
         exitGame = (Button)findViewById(R.id.startGameButton);
@@ -68,9 +119,17 @@ public class MainMenu extends Activity {
         back = (Button) findViewById(R.id.backButton);
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         okScore = (Button) findViewById(R.id.scoreOkButton);
+        howToPlay = (Button)findViewById(R.id.How_to_Play);
+        google = (Button)findViewById(R.id.google);
+        backCreateMap = (Button) findViewById(R.id.createMapBack);
+        nextCreateMap = (Button)findViewById(R.id.mapCreateNext);
+
+
 
         timePlayed = (TextView) findViewById(R.id.timeFinished);
         scoredPoints = (TextView) findViewById(R.id.scoreText);
+
+        mapView = (ListView) findViewById(R.id.listView);
 
         mainMenuSettings = (MainMenuSettings) getIntent().getSerializableExtra("mainMenuSettings");
         if(mainMenuSettings!=null)
@@ -118,9 +177,6 @@ public class MainMenu extends Activity {
     void toggle_layout()
     {
 
-
-
-
         if(mainMenuSettings.mainmenu)
         {
 
@@ -147,11 +203,14 @@ public class MainMenu extends Activity {
         }
         if(mainMenuSettings.createMapScreen)
         {
+            createMapScreen.setVisibility(View.VISIBLE);
+            createMapScreen.setClickable(true);
 
         }
         else
         {
-
+            createMapScreen.setClickable(false);
+            createMapScreen.setVisibility(View.INVISIBLE);
         }
         if(mainMenuSettings.scoreScreen)
         {
@@ -170,6 +229,42 @@ public class MainMenu extends Activity {
 
     void set_listeners()
     {
+
+        backCreateMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
+                System.out.println("clicked backfromCreateMap");
+
+                mainMenuSettings.mainmenu = true;
+                mainMenuSettings.createMapScreen = false;
+                mainMenuSettings.newGameScree = false;
+                mainMenuSettings.scoreScreen = false;
+                toggle_layout();
+            }
+        });
+
+        nextCreateMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
+                System.out.println("clicked nextCreateMap");
+
+                initializeBitmaps();
+                mainMenuSettings.mainmenu = true;
+                mainMenuSettings.createMapScreen = false;
+                mainMenuSettings.newGameScree = false;
+                mainMenuSettings.scoreScreen = false;
+                toggle_layout();
+
+                Intent myIntent = new Intent(MainMenu.this, CreateMapActivity.class);
+                EditText temp = (EditText)findViewById(R.id.mapWidth);
+                int temp2 = Integer.parseInt(temp.getText().toString());
+                myIntent.putExtra("mapWidth",temp2);
+                temp = (EditText)findViewById(R.id.mapHeight);
+                temp2 = Integer.parseInt(temp.getText().toString());
+                myIntent.putExtra("mapHeight",temp2);
+                startActivity(myIntent);
+            }
+        });
+
+
         newGame.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
             System.out.println("clicked newGame");
@@ -192,20 +287,27 @@ public class MainMenu extends Activity {
         startGame.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
                 System.out.println("clicked startGame");
-
+                if(pickedMapLevel == null)
+                {
+                    Toast.makeText(MainMenu.this,"You need to choose level before you start",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(ratingBar.getRating()==0)
+                {
+                    Toast.makeText(MainMenu.this,"You need to choose difficulty before you start",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Intent myIntent = new Intent(MainMenu.this,
                         GamePlayActivity.class);
                 Difficulty dif = new Difficulty((int) ratingBar.getRating());
 
-                startNewLevel = new Level(dif, myFactory.getInstance().test_map_4(),window.getDecorView().getWidth(),window.getDecorView().getHeight());
+                startNewLevel = new Level(dif, pickedMapLevel,window.getDecorView().getWidth(),window.getDecorView().getHeight());
                 startNewLevel.start();
                 initializeBitmaps();
                 while(startNewLevel.running){
                 }
                 myIntent.putExtra("PackedLevel",startNewLevel.packedLevel);
                 startActivity(myIntent);
-
-
             }
         });
         back.setOnClickListener(new View.OnClickListener() {
@@ -258,5 +360,54 @@ public class MainMenu extends Activity {
                 myFactory.getInstance().resize();
 
             }
+
+    public void pickLevelMap(int id)
+    {
+        id = mapList.get(id).get_ID();
+        switch (id)
+        {
+            case 10001:
+            {
+            pickedMapLevel = myFactory.getInstance().test_map_1();
+                break;
+            }
+            case 10002:
+            {
+                pickedMapLevel = myFactory.getInstance().test_map_2(200);
+                break;
+            }
+            case 10003:
+            {
+                pickedMapLevel = myFactory.getInstance().test_map_3();
+                break;
+            }
+            case 10004:
+            {
+                pickedMapLevel = myFactory.getInstance().test_map_4();
+                break;
+            }
+            default:
+            {
+                pickedMapLevel=null;
+                break;
+            }
+        }
+    }
+
+    public void addAllMaps(LinkedList<ListInput> listInputs)
+    {
+        mapList.clear();
+        for(int i = 0;i<listInputs.size();i++)
+        {
+            mapList.add(listInputs.get(i));
+
+        }
+        mapView.setAdapter(new ListElementAdapter(MainMenu.this, mapList));
+    }
+    public void add_map(ListInput listInput)
+    {
+        mapList.add(listInput);
+        mapView.setAdapter(new ListElementAdapter(MainMenu.this, mapList));
+    }
 
 }

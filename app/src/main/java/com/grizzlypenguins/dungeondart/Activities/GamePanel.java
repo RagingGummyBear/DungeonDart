@@ -67,6 +67,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+
         if(runnable)
         {
             double surfaceSize = 0;

@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:text="down"
         android:id="@+id/moveDown"
-        android:layout_below="@+id/moveLeft"
+        android:layout_below="@+id/moveRight"
         android:layout_alignLeft="@+id/moveUp"
         android:layout_alignStart="@+id/moveUp" />
 
@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="left"
-        android:id="@+id/moveLeft"
+        android:id="@+id/moveRight"
         android:layout_below="@+id/moveUp"
         android:layout_toLeftOf="@+id/moveRight"
         android:layout_toStartOf="@+id/moveRight"
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:text="right"
         android:id="@+id/moveRight"
-        android:layout_alignTop="@+id/moveLeft"
+        android:layout_alignTop="@+id/moveRight"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/GamePanel"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/moveLeft"
+        android:layout_toLeftOf="@+id/moveRight"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
