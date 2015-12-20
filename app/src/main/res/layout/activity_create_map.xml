@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="left"
-            android:id="@+id/moveLeft"
+            android:id="@+id/moveLleft"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="500dp" />
 

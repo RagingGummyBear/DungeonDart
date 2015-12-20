@@ -1,10 +1,8 @@
 package com.grizzlypenguins.dungeondart.Activities;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -23,11 +21,9 @@ import com.grizzlypenguins.dungeondart.MyPoint;
 import com.grizzlypenguins.dungeondart.R;
 import com.grizzlypenguins.dungeondart.ScrollViewPackage.ListElementAdapter;
 import com.grizzlypenguins.dungeondart.ScrollViewPackage.ListInput;
-import com.grizzlypenguins.dungeondart.Tile;
 import com.grizzlypenguins.dungeondart.myFactory;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class CreateMapActivity extends Activity {
 
@@ -90,7 +86,7 @@ public class CreateMapActivity extends Activity {
         mapSurfaceView = (SurfaceView) findViewById(R.id.mapSurfaceView);
         canvas =  mapSurfaceView.getHolder().lockCanvas();
         moveDown = (Button) findViewById(R.id.moveDown);
-        moveLeft = (Button) findViewById(R.id.moveLeft);
+        moveLeft = (Button) findViewById(R.id.moveLleft);
         moveRight = (Button) findViewById(R.id.moveRight);
         moveUp = (Button) findViewById(R.id.moveUp);
 

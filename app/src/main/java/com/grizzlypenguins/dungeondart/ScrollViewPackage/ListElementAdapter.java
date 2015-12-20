@@ -84,7 +84,7 @@ public class ListElementAdapter extends BaseAdapter {
 
                     try {
                         MainMenu temp = (MainMenu) context;
-                        if (temp != null) temp.pickLevelMap(num);
+                        if (temp != null) temp.pickLevelMap(mapName.getText().toString());
 
                     }
                     catch (Exception e)

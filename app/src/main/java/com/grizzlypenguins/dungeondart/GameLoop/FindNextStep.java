@@ -22,7 +22,7 @@ public class FindNextStep implements Runnable {
     AStarHeuristic heuristic = new ManhattanHeuristic();
 
     int [][] maze;
-    public static boolean finished = true;
+    public boolean finished = true;
 
     public  MyPoint playerLocation;
     public MyPoint monsterLocation;
@@ -42,7 +42,7 @@ public class FindNextStep implements Runnable {
     public void run() {
         aStar = new AStar(map,heuristic);
         finished = false;
-        Log.v("search", "Start" );
+       // Log.v("search", "Start" );
         ArrayList<MyPoint> shortestPath = null;
        if(aStar!=null)
        {
@@ -53,12 +53,12 @@ public class FindNextStep implements Runnable {
             if(shortestPath.size()>0) {
                 nextStep.x = shortestPath.get(0).x - monsterLocation.x;
                 nextStep.y = shortestPath.get(0).y - monsterLocation.y;
-                Log.v("search", "Monster's x:  " + nextStep.x + "  y: " + nextStep.y);
+               // Log.v("search", "Monster's x:  " + nextStep.x + "  y: " + nextStep.y);
             }
 
         }
         else Log.v("search", "Its a null" );
-        Log.v("search", "End" );
+       // Log.v("search", "End" );
         finished = true;
     }
 

@@ -18,12 +18,10 @@ public class EvilMonster implements Serializable{
 
     public int [][]movementMap;
     public MyPoint location = new MyPoint(0,0);
-    public MyPoint nextStep = new MyPoint(0,0);
     public MyPoint playerLocation = new MyPoint(0,0);
     private Thread thread;
 
     private boolean runAlgo = false;
-
 
     public int speed;
     int move = 1;
@@ -54,7 +52,7 @@ public class EvilMonster implements Serializable{
 
             if (move >= speed) {
 
-                if(FindNextStep.finished)
+                if(myFactory.getInstance().findNextStep.isFinished())
                 {
 
                     this.location.x+=myFactory.getInstance().findNextStep.nextStep.x;
@@ -63,17 +61,9 @@ public class EvilMonster implements Serializable{
                     myFactory.getInstance().findNextStep.playerLocation = this.playerLocation;
 
                     //myFactory.getInstance().findNextStep.run();
-
-
-                    if(FindNextStep.finished)
-                    {
-                        Log.v("evilmonster: ", " player x :  "+ playerLocation.x + " player y: "+playerLocation.y);
-                        Log.v("evilmonster: ", " monster x :  "+ location.x + " monster y: "+location.y);
-                        myFactory.getInstance().findNextStep = new FindNextStep(movementMap,playerLocation,location);
-                    }
-                     thread = new Thread(myFactory.getInstance().findNextStep);
+                   if(myFactory.getInstance().findNextStep.isFinished()) myFactory.getInstance().findNextStep = new FindNextStep(movementMap,playerLocation,location);
+                    thread = new Thread(myFactory.getInstance().findNextStep);
                     thread.start();
-
 
                 }
                 move = 0;
@@ -82,13 +72,13 @@ public class EvilMonster implements Serializable{
             move++;
             return false;
 
-
     }
+
 
     public boolean step ()
     {
-        location.y+=nextStep.y;
-        location.x+=nextStep.x;
+      //  location.y+=nextStep.y;
+       // location.x+=nextStep.x;
         if(location == playerLocation)
         {
             return true;

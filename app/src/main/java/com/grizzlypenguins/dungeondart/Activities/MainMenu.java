@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.grizzlypenguins.dungeondart.Activities.uiScalingClasses.ScaleGamePlayActivity;
 import com.grizzlypenguins.dungeondart.Difficulty;
 import com.grizzlypenguins.dungeondart.Level;
 import com.grizzlypenguins.dungeondart.LevelMap;
@@ -307,6 +308,13 @@ public class MainMenu extends Activity {
                 while(startNewLevel.running){
                 }
                 myIntent.putExtra("PackedLevel",startNewLevel.packedLevel);
+
+                ScaleGamePlayActivity scaleGamePlayActivity= new ScaleGamePlayActivity();
+                scaleGamePlayActivity.setAll(getWindow().getDecorView().getWidth(),getWindow().getDecorView().getHeight());
+
+
+                myIntent.putExtra("ScaleGamePlayActivity",scaleGamePlayActivity);
+
                 startActivity(myIntent);
             }
         });
@@ -361,27 +369,27 @@ public class MainMenu extends Activity {
 
             }
 
-    public void pickLevelMap(int id)
+    public void pickLevelMap(String name)
     {
-        id = mapList.get(id).get_ID();
-        switch (id)
+        //id = mapList.get(id).get_ID();
+        switch (name)
         {
-            case 10001:
+            case "a":
             {
             pickedMapLevel = myFactory.getInstance().test_map_1();
                 break;
             }
-            case 10002:
+            case "s":
             {
                 pickedMapLevel = myFactory.getInstance().test_map_2(200);
                 break;
             }
-            case 10003:
+            case "TestMap3":
             {
                 pickedMapLevel = myFactory.getInstance().test_map_3();
                 break;
             }
-            case 10004:
+            case "test_map_4":
             {
                 pickedMapLevel = myFactory.getInstance().test_map_4();
                 break;

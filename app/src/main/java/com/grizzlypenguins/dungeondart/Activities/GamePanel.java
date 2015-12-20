@@ -6,11 +6,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.grizzlypenguins.dungeondart.Activities.uiScalingClasses.ScaleGamePlayActivity;
 import com.grizzlypenguins.dungeondart.GameLoop.MyGameLoop;
 import com.grizzlypenguins.dungeondart.PackedLevel;
 import com.grizzlypenguins.dungeondart.PlayerScoring;
@@ -29,12 +31,11 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     public PackedLevel level;
     MyGameLoop myGameLoop;
     boolean runnable= false;
-    boolean flipflop= true;
     float canvasZoom = 0;
     boolean gameFinished = false;
 
 
-    Tile test;
+
 
     public GamePanel(Context context, AttributeSet attrs)
     {
@@ -55,9 +56,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     {
 
 
-        myGameLoop = new MyGameLoop(this);
-        test = myFactory.getInstance().test_tile_1();
-
+       if(myGameLoop == null) myGameLoop = new MyGameLoop(this);
        // this.setFocusable(true);
         runnable = true;
 
@@ -82,6 +81,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
             double scale =  surfaceSize/(myFactory.TILENUMBER * myFactory.TILESIZE);
             canvasZoom = (float) scale;
+            this.setMinimumHeight((int) scale);
+            this.setMinimumWidth((int) scale);
             this.start();
             runnable = false;
 
@@ -112,7 +113,14 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         myGameLoop.setRunning(false);
+        this.runnable = true;
 
+    }
+
+    public void stop()
+    {
+        myGameLoop.setRunning(false);
+        this.runnable = true;
     }
 
     public void tick(){
@@ -145,6 +153,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             case "left" :
             {
                 level.cameraControl.move_left  = true;
+                Log.v("GamePlanel","moveLeft button pressed");
                 break;
             }
             case "up" :
@@ -174,34 +183,14 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         canvas.scale(canvasZoom, canvasZoom, 1, 1);
         canvas.save();
 
-        test.render(canvas, 0, 0);
-
-        Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
-        paint.setStrokeWidth(3);
-        canvas.drawRect(30, 30, 80, 80, paint);
-        paint.setStrokeWidth(0);
-        paint.setColor(Color.CYAN);
-        canvas.drawRect(33, 60, 77, 77, paint);
-
-        if(flipflop)
-        {
-            paint.setColor(Color.YELLOW);
-            canvas.drawRect(33, 33, 77, 60, paint);
-            flipflop = false;
-        }
-        else{
-            paint.setColor(Color.BLUE);
-            canvas.drawRect(33, 33, 77, 60, paint);
-            flipflop = true;
-        }
+//        test.render(canvas, 0, 0);
 
         if(level != null)
         {
           level.render(canvas);
         }
         canvas.restore();
-        if(level.gameFinished)this.finishGame();
+     if(level!=null)   if(level.gameFinished)this.finishGame();
     }
 
     public void finishGame()

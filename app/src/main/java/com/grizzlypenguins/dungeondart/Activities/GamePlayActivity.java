@@ -1,5 +1,6 @@
 package com.grizzlypenguins.dungeondart.Activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -8,14 +9,22 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Layout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
+import com.google.android.gms.ads.formats.NativeContentAdView;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.grizzlypenguins.dungeondart.Activities.uiScalingClasses.ScaleGamePlayActivity;
 import com.grizzlypenguins.dungeondart.PackedLevel;
 import com.grizzlypenguins.dungeondart.R;
 
@@ -24,6 +33,7 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
 
     private SensorManager sensorManager;
     private long lastUpdate;
+    ScaleGamePlayActivity scaleGamePlayActivity;
 
     Button move_up;
     Button move_down;
@@ -53,9 +63,13 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
         // set up full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game_play);
+
         initialize();
         set_listeners();
+        resizeLayouts();
+
         timerHandler.postDelayed(timerRunnable, 500);
+
 
 
         //System.out.println(level.cameraControl.player_position.x + " "+ level.difficulty.starNumber + " " +level.mainCharacter.speed + "  "+ level.levelMap.tileNumber );
@@ -87,20 +101,58 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
     void initialize()
     {
         level = (PackedLevel) getIntent().getSerializableExtra("PackedLevel");
+        scaleGamePlayActivity = (ScaleGamePlayActivity) getIntent().getSerializableExtra("ScaleGamePlayActivity");
+
         gamePanel = (GamePanel) findViewById(R.id.GamePanel);
 
         move_up = (Button)findViewById(R.id.moveUp);
         move_down = (Button)findViewById(R.id.moveDown);
-        move_left = (Button)findViewById(R.id.moveRight);
+        move_left = (Button)findViewById(R.id.moveLeft);
         move_right = (Button)findViewById(R.id.moveRight);
 
         gamePanel.level = level;
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         lastUpdate = System.currentTimeMillis();
 
+    }
+    void resizeLayouts()
+    {
+
+        RelativeLayout.LayoutParams layout;
+        /*
+        move_left.setHeight((int) (getWindow().getDecorView().getHeight()*0.05));
+        move_left.setWidth((int) (getWindow().getDecorView().getWidth()*0.05));
+        */
+        layout = (RelativeLayout.LayoutParams) move_left.getLayoutParams();
+        move_left.getLayoutParams().width = scaleGamePlayActivity.middleButtonWidth;   //(int) (getResources().getDisplayMetrics().density*(getWindow().getDecorView().getWidth()*0.05));
+        move_left.getLayoutParams().height = scaleGamePlayActivity.middleButtonHeight; //(int)  (getResources().getDisplayMetrics().density*(getWindow().getDecorView().getHeight()*0.02));
+
+
+        // layout.height = (int) (getWindow().getDecorView().getHeight()*0.2);
+       // layout.width = (int) (getWindow().getDecorView().getWidth()*0.2);
+        //move_left.setLayoutParams(new RelativeLayout.LayoutParams(layout));
+
+        move_up.getLayoutParams().width = scaleGamePlayActivity.notMiddleButtonWidth;
+        move_up.getLayoutParams().height = scaleGamePlayActivity.notMiddleButtonHeight;
+
+        move_down.getLayoutParams().width = scaleGamePlayActivity.notMiddleButtonWidth;
+        move_down.getLayoutParams().height = scaleGamePlayActivity.notMiddleButtonHeight;
+
+        move_right.getLayoutParams().width = scaleGamePlayActivity.middleButtonWidth;
+        move_right.getLayoutParams().height = scaleGamePlayActivity.middleButtonHeight;
+
+        gamePanel.getLayoutParams().width = scaleGamePlayActivity.GamePanel;
+        gamePanel.getLayoutParams().height = scaleGamePlayActivity.GamePanel;
+
+        ((RelativeLayout.LayoutParams) move_left.getLayoutParams()).setMargins(scaleGamePlayActivity.leftButtonLeftMargin , scaleGamePlayActivity.leftButtonTopMargin,0,0);
+        ((RelativeLayout.LayoutParams) move_right.getLayoutParams()).setMargins(scaleGamePlayActivity.rightButtonLeftMargin,0,0,0);
+        ((RelativeLayout.LayoutParams) move_down.getLayoutParams()).setMargins(scaleGamePlayActivity.downButtonLeftMargin,0,0,0);
+        ((RelativeLayout.LayoutParams) move_up.getLayoutParams()).setMargins(0,0,0,0);
 
 
 
+        // PackedLevel level ;
+       // GamePanel gamePanel;
     }
     void set_listeners()
     {
@@ -144,14 +196,17 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
         move_left.setOnTouchListener(new Button.OnTouchListener(){
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+               // Log.v("GamePlayActivity", "moveLeft button pressed");
+
                 switch(event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
 
                         gamePanel.pressedButton("left");
+                     //   Log.v("GamePlayActivity", "moveLeft button pressed");
                         // PRESSED
                         return true; // if you want to handle the touch event
                     case MotionEvent.ACTION_UP:
-                        gamePanel.pressedButton("none");
+                       // gamePanel.pressedButton("none");
                         // RELEASED
                         return true; // if you want to handle the touch event
                 }
@@ -235,6 +290,7 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
         super.onPause();
         timerHandler.removeCallbacks(timerRunnable);
         sensorManager.unregisterListener(this);
+        gamePanel.stop();
     }
 
     void change_Activity()
