@@ -61,6 +61,9 @@ public class CreateMapActivity extends Activity {
 
     private boolean once = true;
     private boolean shouldRun = true;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -225,16 +228,7 @@ public class CreateMapActivity extends Activity {
         });
     }
 
-    /*
-    "movabletile", 0, 0));
-        listViewTiles.add(new ListInput( "notmovabletile",0,0));
-        listViewTiles.add(new ListInput( "finishtile",0,0));
-        listViewTiles.add(new ListInput( "starttile",0,0));
-        listViewTiles.add(new ListInput( "monsterstarttile",0,0));
-        listViewTiles.add(new ListInput( "poweruptile",0,0));
-        listViewTiles.add(new ListInput( "traptile",0,0));
-        listViewTiles.add(new ListInput( "powerupandtraptile",0,
-     */
+
 
     void drawTileAtLocation(float x,float y)
     {

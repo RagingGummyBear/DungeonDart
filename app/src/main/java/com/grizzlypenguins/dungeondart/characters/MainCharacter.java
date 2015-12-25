@@ -43,16 +43,7 @@ public class MainCharacter implements Serializable {
 
     public void tick () // da se aktiviraat powerUps-ot t.e. effectite od powerUps i Traps
     {
-        /*
-        for(int i=0;i<effects.size();i++)
-        {
-            effects.get(i).tick();
-            if(!effects.get(i).active)
-            {
-                effects.remove(i);
-            }
-        }
-        */
+
     }
 
     public void render(Canvas c) {

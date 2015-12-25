@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,7 +57,6 @@ public class MainMenu extends Activity {
     Window window;
 
     LevelMap pickedMapLevel;
-
     MainMenuSettings mainMenuSettings;
 
     @Override
@@ -233,7 +233,7 @@ public class MainMenu extends Activity {
 
         backCreateMap.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-                System.out.println("clicked backfromCreateMap");
+
 
                 mainMenuSettings.mainmenu = true;
                 mainMenuSettings.createMapScreen = false;
@@ -245,7 +245,7 @@ public class MainMenu extends Activity {
 
         nextCreateMap.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-                System.out.println("clicked nextCreateMap");
+
 
                 initializeBitmaps();
                 mainMenuSettings.mainmenu = true;
@@ -268,7 +268,7 @@ public class MainMenu extends Activity {
 
         newGame.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-            System.out.println("clicked newGame");
+
 
                 mainMenuSettings.mainmenu = false;
                 mainMenuSettings.createMapScreen = false;
@@ -280,14 +280,15 @@ public class MainMenu extends Activity {
 
         exitGame.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-                System.out.println("clicked exitGame");
 
+                finish();
+                System.exit(0);
 
             }
         });
         startGame.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-                System.out.println("clicked startGame");
+
                 if(pickedMapLevel == null)
                 {
                     Toast.makeText(MainMenu.this,"You need to choose level before you start",Toast.LENGTH_SHORT).show();
@@ -304,23 +305,27 @@ public class MainMenu extends Activity {
 
                 startNewLevel = new Level(dif, pickedMapLevel,window.getDecorView().getWidth(),window.getDecorView().getHeight());
                 startNewLevel.start();
+
                 initializeBitmaps();
-                while(startNewLevel.running){
-                }
-                myIntent.putExtra("PackedLevel",startNewLevel.packedLevel);
+
+
 
                 ScaleGamePlayActivity scaleGamePlayActivity= new ScaleGamePlayActivity();
-                scaleGamePlayActivity.setAll(getWindow().getDecorView().getWidth(),getWindow().getDecorView().getHeight());
+                scaleGamePlayActivity.setAll(getWindow().getDecorView().getWidth(), getWindow().getDecorView().getHeight());
 
+                myIntent.putExtra("ScaleGamePlayActivity", scaleGamePlayActivity);
 
-                myIntent.putExtra("ScaleGamePlayActivity",scaleGamePlayActivity);
+                while(startNewLevel.running){
+                }
+
+                myIntent.putExtra("PackedLevel", startNewLevel.packedLevel);
 
                 startActivity(myIntent);
             }
         });
         back.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View arg0) {
-                        System.out.println("clicked backButton");
+
                         mainMenuSettings.mainmenu = true;
                         mainMenuSettings.createMapScreen = false;
                         mainMenuSettings.newGameScree = false;
@@ -342,7 +347,8 @@ public class MainMenu extends Activity {
             }
         });
 
-    }        private void initializeBitmaps()
+    }
+    private void initializeBitmaps()
             {
 
                 myFactory.getInstance().TileNotMovable = BitmapFactory.decodeResource(getResources(), R.drawable.notmovabletile);

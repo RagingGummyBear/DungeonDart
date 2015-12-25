@@ -44,6 +44,7 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
     GamePanel gamePanel;
 
     Handler timerHandler = new Handler();
+
     Runnable timerRunnable = new Runnable() {
 
         @Override
@@ -63,13 +64,13 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
         // set up full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game_play);
-
+        Log.v("GamePlayActivity ", "    Started ");
         initialize();
         set_listeners();
         resizeLayouts();
 
         timerHandler.postDelayed(timerRunnable, 500);
-
+        Log.v("GamePlayActivity ", "    DoneInitialize ");
 
 
         //System.out.println(level.cameraControl.player_position.x + " "+ level.difficulty.starNumber + " " +level.mainCharacter.speed + "  "+ level.levelMap.tileNumber );
