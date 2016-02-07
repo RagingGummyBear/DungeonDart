@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
+import com.grizzlypenguins.dungeondart.Animation.SimpleAnimation;
 import com.grizzlypenguins.dungeondart.effects.PowerUpMovementSpeed;
 import com.grizzlypenguins.dungeondart.effects.PowerUpsAndTrapsBank;
 
@@ -12,6 +13,7 @@ import java.io.Serializable;
 
 /**
  * Created by Darko on 17.11.2015.
+ * Its part of the levelMap nad its the blocks on which the user can step on. Prints the tiles and the monster.
  */
 
 public class Tile implements Serializable {
@@ -20,9 +22,9 @@ public class Tile implements Serializable {
     private int _id;
     private int define;  //defines the tile with : 0 wall,1 movable,2 start,3 finish, 4 choosenStart,5 working exit, 6 not working exit, 7 monsterDen
     public int x,y;
-    public int powerUp = 0; // powerUp = 0 , no powerup on that tile
-    public int trap = 0;   // trap = 0, no traps on that Tile trap<0 used trap
-
+    public int powerUp = -1; // powerUp = -1 , no powerup on that tile
+    public int trap = -1;   // trap = -1, no traps on that Tile trap<0 used trap or no traps
+    private int mapID;
     public boolean shadow = false;
     public boolean monster = false;
 
@@ -103,7 +105,7 @@ public class Tile implements Serializable {
     public int use_powerUp()
     {
         int temp = powerUp;
-        powerUp = 0;
+        powerUp = -1;
         return temp;
     }
 
@@ -114,11 +116,11 @@ public class Tile implements Serializable {
     public int use_trap()
     {
         int temp = trap;
-        trap = 0;
+        trap =-1;
         return temp;
     }
 
-    public void render(Canvas c,float x, float y) {
+    public void render(Canvas c,float x, float y,SimpleAnimation monsterAnim) {
         if (shadow) {
 
             return;
@@ -131,7 +133,7 @@ public class Tile implements Serializable {
         }
         if(c==null)
         {
-            Log.v("Tile","The canvas is null");
+            Log.v("Tile", "The canvas is null");
             return;
         }
         switch (define) {
@@ -142,6 +144,16 @@ public class Tile implements Serializable {
             }
             case 1: {
                 c.drawBitmap(myFactory.getInstance().TileMovable, x, y, myFactory.getInstance().paint);
+                break;
+            }
+            case 2:
+            {
+                c.drawBitmap(myFactory.getInstance().TileStart,x,y,myFactory.getInstance().paint);
+                break;
+            }
+            case 3:
+            {
+                c.drawBitmap(myFactory.getInstance().TileFinish,x,y,myFactory.getInstance().paint);
                 break;
             }
             case 4: {
@@ -156,18 +168,33 @@ public class Tile implements Serializable {
                 c.drawBitmap(myFactory.getInstance().TileNFinish, x, y, myFactory.getInstance().paint);
                 break;
             }
+            case 7:{
+
+                c.drawBitmap(myFactory.getInstance().TileMovable, x, y, myFactory.getInstance().paint);
+                c.drawBitmap(myFactory.getInstance().EvilMonster,x,y,myFactory.getInstance().paint);
+                break;
+            }
             default: {
                 c.drawBitmap(myFactory.getInstance().TileMovable, x, y, myFactory.getInstance().paint);
                 break;
             }
         }
-        if(monster)
-        {
-            c.drawBitmap(myFactory.getInstance().EvilMonster,x,y,myFactory.getInstance().paint);
-        }
+
         PowerUpsAndTrapsBank.getInstance().renderTrap(c,x,y,trap);
         PowerUpsAndTrapsBank.getInstance().renderPowerUp(c,x,y,powerUp);
+        if(monster)
+        {
+           if(monsterAnim != null) monsterAnim.render(c,x,y);
+            //c.drawBitmap(myFactory.getInstance().EvilMonster,x,y,myFactory.getInstance().paint);
+        }
     }
 
 
+    public int getMapID() {
+        return mapID;
+    }
+
+    public void setMapID(int mapID) {
+        this.mapID = mapID;
+    }
 }

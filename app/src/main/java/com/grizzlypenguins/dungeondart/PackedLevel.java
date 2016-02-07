@@ -3,6 +3,8 @@ package com.grizzlypenguins.dungeondart;
 import android.graphics.Canvas;
 import android.util.Log;
 
+import com.grizzlypenguins.dungeondart.Animation.MainCharacterMovement;
+import com.grizzlypenguins.dungeondart.Animation.SpiderMonsterAnimation;
 import com.grizzlypenguins.dungeondart.CameraControl;
 import com.grizzlypenguins.dungeondart.Difficulty;
 import com.grizzlypenguins.dungeondart.GameLoop.FindNextStep;
@@ -18,12 +20,15 @@ import java.util.ArrayList;
 
 /**
  * Created by Darko on 22.11.2015.
+ * Contains the game logic.
+ * Has reference to all of the game objects
+ *
  */
 public class PackedLevel implements Serializable {
 
-    public PlayerScoring playerScoring;
-    public Difficulty difficulty;
-    public LevelMap levelMap;
+    public PlayerScoring playerScoring;  //Calculates the score and the time for the game
+    public Difficulty difficulty; //Has information about the difficulty of the the current game
+    public LevelMap levelMap; //The playable map
     public CameraControl cameraControl;
     public MainCharacter mainCharacter;
     public TorchLight torchLight;
@@ -41,6 +46,8 @@ public class PackedLevel implements Serializable {
         this.evilMonster = evilMonster;
         playerScoring = new PlayerScoring();
         myFactory.getInstance().findNextStep = new FindNextStep(myFactory.getInstance().get_MovementMap(levelMap.tiles),cameraControl.player_position,evilMonster.location);
+        mainCharacter.mainCharacterMovement = new MainCharacterMovement(cameraControl);
+        evilMonster.monsterAnim = new SpiderMonsterAnimation(evilMonster);
     }
 
    public void tick() throws Exception {
@@ -90,13 +97,13 @@ public class PackedLevel implements Serializable {
         try{
             cameraControl.preMonsterRender();
             levelMap.tiles[evilMonster.location.x][evilMonster.location.y].monster = true;
-            cameraControl.render(c);
+            cameraControl.render(c,evilMonster.monsterAnim);
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+          //  System.out.println(e.getMessage());
         }
-        evilMonster.render(c,0,0);
+        //evilMonster.render(c,0,0);
         mainCharacter.render(c);
         torchLight.render(c);
     }

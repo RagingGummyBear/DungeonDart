@@ -15,7 +15,7 @@ public class LevelMap implements Serializable {
     // table fields
     private int _id;
     private String mapName;
-    private int _userid; // foreign key
+    //private int _userid; // foreign key
 
     public Tile tiles [][];  //tile [height][width]
 
@@ -49,13 +49,15 @@ public class LevelMap implements Serializable {
         mapName = mapname;
     }
 
-    public int getUserId() {
+    /*public int getUserId() {
         return _userid;
     }
 
     public void setUserId(int userid) {
         _userid = userid;
     }
+
+    */
 
     /*
         end of added getters and setters
@@ -71,19 +73,6 @@ public class LevelMap implements Serializable {
     /*
         end of added constructor
      */
-
-    public  LevelMap (Tile Tiles [][],String mapName,int _id)
-    {
-        this._id = _id;
-        this.mapName = mapName;
-        tiles = Tiles;
-
-        //width = Width;
-        //height = Height;
-//        this.tileNumber = tileNumber;
-
-
-    }
 
     public  LevelMap (Tile Tiles [][],String mapName)
     {
@@ -120,15 +109,18 @@ public class LevelMap implements Serializable {
                 {
                     // Implement the drawing of start and finish tiles
                     starts.add(new MyPoint(i, y));
+                    tiles[i][y].setDefine(1);
 
                 }
                 if(tiles[i][y].getDefine() == 3)
                 {
                     finishs.add(new MyPoint(i, y));
+                    tiles[i][y].setDefine(6);
                 }
                 if(tiles[i][y].getDefine() == 7)
                 {
                     monsterStarts.add(new MyPoint(i,y));
+                    tiles[i][y].setDefine(1);
                 }
 
             }
@@ -136,9 +128,10 @@ public class LevelMap implements Serializable {
         }
 
         this.end = choose_End();
+        tiles[end.x][end.y].setDefine(5); //changing the look of the picked finish
         this.start = choose_Start();
         this.monsterStart = choose_monsterStart();
-        if(!checkStartAndEnd())
+        if(end == null || start == null || monsterStart == null)
         {
             // throw new Exception("Couldn't find suitable start or end");
         }
@@ -181,7 +174,7 @@ public class LevelMap implements Serializable {
             {
                 good3 = true;
                 monsterStart = monsterStarts.get(i);
-                tiles[monsterStarts.get(i).x][monsterStarts.get(i).y].setDefine(7);
+                tiles[monsterStarts.get(i).x][monsterStarts.get(i).y].setDefine(1);
                 break;
             }
 

@@ -1,9 +1,14 @@
 package com.grizzlypenguins.dungeondart.Activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,10 +23,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.grizzlypenguins.dungeondart.Activities.uiScalingClasses.ScaleCreateMapActivity;
 import com.grizzlypenguins.dungeondart.Activities.uiScalingClasses.ScaleGamePlayActivity;
 import com.grizzlypenguins.dungeondart.Difficulty;
+import com.grizzlypenguins.dungeondart.Entities.DungeonDartDBHandler;
 import com.grizzlypenguins.dungeondart.Level;
 import com.grizzlypenguins.dungeondart.LevelMap;
+import com.grizzlypenguins.dungeondart.NetworkClasses.OnlineMap;
+import com.grizzlypenguins.dungeondart.NetworkClasses.ServerCommands;
 import com.grizzlypenguins.dungeondart.PlayerScoring;
 import com.grizzlypenguins.dungeondart.R;
 import com.grizzlypenguins.dungeondart.ScrollViewPackage.ListElementAdapter;
@@ -31,16 +40,25 @@ import com.grizzlypenguins.dungeondart.myFactory;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+
+/**
+ *  MainMenu is the starting activity. From this activity we can start playing the game,create new maps for play
+ *  and connect to googleplay.
+ */
+
 public class MainMenu extends Activity {
 
-    RelativeLayout mainScreen;
-    FrameLayout createGameScreen;
-    RelativeLayout scoreScreen;
-    FrameLayout createMapScreen;
+    //We keep reference for the few other layouts that change when using the buttons from the mainMneu
+    RelativeLayout mainScreen;  //The starting screen
+    FrameLayout createGameScreen; //Screen used for selecting map and difficulty before starting a game
+    RelativeLayout scoreScreen; //Screen that is used after the player has finish a game, whenever he won or lost
+    FrameLayout createMapScreen; //Screen where the user needs to give information before starting to create the map
 
+    //mapView and mapList are used to show maps available for play and the score achieved on them. They are used in createGameScreen
     ListView mapView;
     ArrayList<ListInput> mapList = new ArrayList<ListInput>();
 
+    //We keep reference to the buttons that in the mainMenu, so that we can add listerners to them and change layoutParameters
     Button newGame;
     Button exitGame;
     Button startGame;
@@ -49,27 +67,75 @@ public class MainMenu extends Activity {
     Button backCreateMap;
     Button nextCreateMap;
 
+    //timePlayed and socredPoits are present in the scoreScreen and are used to display few informations about the game that was finished
     TextView timePlayed;
     TextView scoredPoints;
 
+    //ratingBar and startNewLevel give us information about the difficulty settings and the selected map for the next game
     RatingBar ratingBar;
     Level startNewLevel;
+    LevelMap pickedMapLevel; //Its the actual selected map from the ListView mapView
+
+    //Reference to the screen so we can get the Height and Width (needs to be refactored since its not required to have reference to it)
     Window window;
 
-    LevelMap pickedMapLevel;
+    //Class that helps with moving between the layouts in the mainMenu
     MainMenuSettings mainMenuSettings;
+
+
+    //DataBase
+    DungeonDartDBHandler dungeonDartDBHandler;
+    SQLiteDatabase db;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        initialize();
-        set_listeners();
+        initialize(); //Sets the references to the buttons,layouts etc.
+        set_listeners();//Sets listeners to the buttons
+
+        dungeonDartDBHandler = new DungeonDartDBHandler(this.getApplicationContext(), null, null, 1);
+        db = dungeonDartDBHandler.getWritableDatabase();
+
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if(!prefs.getBoolean("once",false))
+        {
+           /* new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    dungeonDartDBHandler.addMap(myFactory.getInstance().test_map_4());
+                    dungeonDartDBHandler.addMap(myFactory.getInstance().test_map_3());
+
+                    mapList = dungeonDartDBHandler.getAllMaps();
+                    mapView.setAdapter(new ListElementAdapter(MainMenu.this, mapList));
+
+
+                }
+            }).start();
+*/
+            dungeonDartDBHandler.addMap(myFactory.getInstance().test_map_4());
+            dungeonDartDBHandler.addMap(myFactory.getInstance().test_map_3());
+
+            /*
+            OnlineMap onlineMap = new OnlineMap();
+            onlineMap.command = ServerCommands.cGetMapWithID;
+            onlineMap.mapID = 1;
+            onlineMap.execute();
+            while(!onlineMap.finish);
+            dungeonDartDBHandler.addMap(onlineMap.levelMap);
+            */
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("once", true);
+            editor.commit();
+        }
+
 
         //TEST MAPS
         //should remove these
+        /*
         LevelMap temp = myFactory.getInstance().test_map_1();
         mapList.add(new ListInput(temp.getMapName(), 0, temp.getId()));
         temp = myFactory.getInstance().test_map_2(200);
@@ -79,7 +145,16 @@ public class MainMenu extends Activity {
         temp = myFactory.getInstance().test_map_4();
         ListInput temp2 = new ListInput(temp.getMapName(), 0, temp.getId());
         this.add_map(temp2);
-        window = this.getWindow();
+        */
+
+        window = this.getWindow();//as said previously this needs to get refactored and removed
+
+
+
+
+        mapList = dungeonDartDBHandler.getAllMaps();
+        mapView.setAdapter(new ListElementAdapter(MainMenu.this, mapList));
+
 
     }
     public void GoogleLoging(View v){
@@ -98,16 +173,17 @@ public class MainMenu extends Activity {
     }
 
     public void createMapButtonPressed(View v){
+        //Doesnt do something special just changes the current layout
+
                 mainMenuSettings.mainmenu = false;
                 mainMenuSettings.scoreScreen = false;
                 mainMenuSettings.newGameScree = false;
                 mainMenuSettings.createMapScreen = true;
+
                 toggle_layout();
     }
 
     private void initialize() {
-
-
 
         mainScreen = (RelativeLayout)findViewById(R.id.firstScreen);
         createGameScreen = (FrameLayout)findViewById(R.id.createGameScreen);
@@ -115,6 +191,7 @@ public class MainMenu extends Activity {
         createMapScreen = (FrameLayout) findViewById(R.id.createMapScreen);
 
         newGame = (Button)findViewById(R.id.newGameButton);
+
         exitGame = (Button)findViewById(R.id.startGameButton);
         startGame = (Button) findViewById(R.id.startGameButton);
         back = (Button) findViewById(R.id.backButton);
@@ -125,26 +202,25 @@ public class MainMenu extends Activity {
         backCreateMap = (Button) findViewById(R.id.createMapBack);
         nextCreateMap = (Button)findViewById(R.id.mapCreateNext);
 
-
-
         timePlayed = (TextView) findViewById(R.id.timeFinished);
         scoredPoints = (TextView) findViewById(R.id.scoreText);
 
         mapView = (ListView) findViewById(R.id.listView);
 
         mainMenuSettings = (MainMenuSettings) getIntent().getSerializableExtra("mainMenuSettings");
-        if(mainMenuSettings!=null)
+        if(mainMenuSettings!=null) //Incase we return to the mainMenu the layout settings might be changed and we need to check for the current settings
         {
             toggle_layout();
         }
-        else
+        else  //Happens when we first start the app and we dont return to the mainActivity from some other activiry
         {
             mainMenuSettings = new MainMenuSettings();
             mainMenuSettings.mainmenu = true;
             toggle_layout();
         }
+
         PlayerScoring playerScoring = (PlayerScoring) getIntent().getSerializableExtra("scoring");
-        if(playerScoring!=null)
+        if(playerScoring!=null)  //We have finished the game and now we need to display the Information about the game that the user played.
         {
             timePlayed.setText(playerScoring.getTime());
             scoredPoints.setText(String.format(playerScoring.score+""));
@@ -169,13 +245,17 @@ public class MainMenu extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            Intent myIntent = new Intent(MainMenu.this, DownloadMapsFromServerActivity.class);
+            startActivity(myIntent);
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    void toggle_layout()
+    void toggle_layout()  //function that hides and show the layouts based on the mainMenuSettings( usually the mainMenuSettings is modified with pressing buttons )
     {
 
         if(mainMenuSettings.mainmenu)
@@ -228,12 +308,12 @@ public class MainMenu extends Activity {
 
     }
 
-    void set_listeners()
+    void set_listeners() //Function where we assign behavior for pressing buttons
     {
 
+        //backCreateMap just changes the displaying layout in the mainMneu
         backCreateMap.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-
 
                 mainMenuSettings.mainmenu = true;
                 mainMenuSettings.createMapScreen = false;
@@ -243,29 +323,70 @@ public class MainMenu extends Activity {
             }
         });
 
+
+        //Starts the CreateMapActivity
         nextCreateMap.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
 
 
-                initializeBitmaps();
+                initializeBitmaps();  //Initializes the Bitmaps that will be used for creating map and resize them
                 mainMenuSettings.mainmenu = true;
                 mainMenuSettings.createMapScreen = false;
                 mainMenuSettings.newGameScree = false;
                 mainMenuSettings.scoreScreen = false;
                 toggle_layout();
 
+                //myIntent changes to the CreateMapActivity
                 Intent myIntent = new Intent(MainMenu.this, CreateMapActivity.class);
+
+
+                //Gets the number of tiles in width for the map and stores them into the intent
                 EditText temp = (EditText)findViewById(R.id.mapWidth);
                 int temp2 = Integer.parseInt(temp.getText().toString());
                 myIntent.putExtra("mapWidth",temp2);
+
+                int tileNumber = temp2;
+
+                //Gets the number of tiles in height for the map and stores them into the intent
                 temp = (EditText)findViewById(R.id.mapHeight);
                 temp2 = Integer.parseInt(temp.getText().toString());
                 myIntent.putExtra("mapHeight",temp2);
+
+                tileNumber*=temp2;
+
+                if(tileNumber> 14400)
+                {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Please select less than 14400( width * height ) tiles for your map");
+                    alertDialogBuilder.setTitle("Please reduce the number of tiles");
+                    alertDialogBuilder.setMessage(sb.toString());
+                    alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    return;
+                }
+
+                temp = (EditText) findViewById(R.id.MapName);
+                String mapName = temp.getText().toString();
+                myIntent.putExtra("mapName",mapName);
+
+                //Information required for the correct scaling in the next Activity
+                ScaleCreateMapActivity scaleCreateMapActivity= new ScaleCreateMapActivity();
+                scaleCreateMapActivity.setAll(getWindow().getDecorView().getWidth(), getWindow().getDecorView().getHeight());
+                myIntent.putExtra("ScaleCreateMapActivity", scaleCreateMapActivity);
+
                 startActivity(myIntent);
             }
         });
 
-
+        //Changes the Layout
         newGame.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
 
@@ -274,10 +395,13 @@ public class MainMenu extends Activity {
                 mainMenuSettings.createMapScreen = false;
                 mainMenuSettings.newGameScree = true;
                 mainMenuSettings.scoreScreen = false;
+                mapList = dungeonDartDBHandler.getAllMaps();
+                mapView.setAdapter(new ListElementAdapter(MainMenu.this, mapList));
                 toggle_layout();
             }
         });
 
+        //Closes the app
         exitGame.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
 
@@ -286,9 +410,12 @@ public class MainMenu extends Activity {
 
             }
         });
+
+        //Starts new game
         startGame.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
 
+                //User must choose the map and the difficulty before starting the match
                 if(pickedMapLevel == null)
                 {
                     Toast.makeText(MainMenu.this,"You need to choose level before you start",Toast.LENGTH_SHORT).show();
@@ -299,27 +426,31 @@ public class MainMenu extends Activity {
                     Toast.makeText(MainMenu.this,"You need to choose difficulty before you start",Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 Intent myIntent = new Intent(MainMenu.this,
                         GamePlayActivity.class);
+
+                //Creates a pack of information for the chosen difficulty
                 Difficulty dif = new Difficulty((int) ratingBar.getRating());
 
+                //startNewLevel gets fill with the required information in order to generate PackedMapLevel
                 startNewLevel = new Level(dif, pickedMapLevel,window.getDecorView().getWidth(),window.getDecorView().getHeight());
-                startNewLevel.start();
+                startNewLevel.start(); //Starts generating the PackMapLevel
 
                 initializeBitmaps();
 
-
-
+                //We put ScaleGamePlayActivity in the intent as well so we can have the information required for scaling the next Activity in its onCreate function
                 ScaleGamePlayActivity scaleGamePlayActivity= new ScaleGamePlayActivity();
                 scaleGamePlayActivity.setAll(getWindow().getDecorView().getWidth(), getWindow().getDecorView().getHeight());
 
                 myIntent.putExtra("ScaleGamePlayActivity", scaleGamePlayActivity);
 
+                //Wait for PackedMapLevel to be generated
                 while(startNewLevel.running){
                 }
 
-                myIntent.putExtra("PackedLevel", startNewLevel.packedLevel);
 
+                myIntent.putExtra("PackedLevel", startNewLevel.packedLevel);
                 startActivity(myIntent);
             }
         });
@@ -351,6 +482,17 @@ public class MainMenu extends Activity {
     private void initializeBitmaps()
             {
 
+                if(getWindow().getDecorView().getHeight() < getWindow().getDecorView().getWidth())
+                myFactory.getInstance().set_Size(getWindow().getDecorView().getHeight());
+                else
+                    myFactory.getInstance().set_Size(getWindow().getDecorView().getWidth());
+
+                myFactory.getInstance().arrowL = BitmapFactory.decodeResource(getResources(),R.drawable.arrowl);
+                myFactory.getInstance().arrowR = BitmapFactory.decodeResource(getResources(),R.drawable.arrowr);
+                myFactory.getInstance().arrowU = BitmapFactory.decodeResource(getResources(),R.drawable.arrowu);
+                myFactory.getInstance().arrowD = BitmapFactory.decodeResource(getResources(),R.drawable.arrowd);
+
+
                 myFactory.getInstance().TileNotMovable = BitmapFactory.decodeResource(getResources(), R.drawable.notmovabletile);
                 myFactory.getInstance().TileMovable = BitmapFactory.decodeResource(getResources(), R.drawable.movabletile);
                 myFactory.getInstance().TorchLight = BitmapFactory.decodeResource(getResources(),R.drawable.beginingfog);
@@ -371,14 +513,58 @@ public class MainMenu extends Activity {
                 myFactory.getInstance().TrapY = BitmapFactory.decodeResource(getResources(),R.drawable.trapy);
                 myFactory.getInstance().TrapB = BitmapFactory.decodeResource(getResources(),R.drawable.trapb);
 
+                myFactory.getInstance().mainCharacterPictures.put("standStillD",BitmapFactory.decodeResource(getResources(),R.drawable.standstilld));
+                myFactory.getInstance().mainCharacterPictures.put("standStillU",BitmapFactory.decodeResource(getResources(),R.drawable.standstillu));
+                myFactory.getInstance().mainCharacterPictures.put("standStillR",BitmapFactory.decodeResource(getResources(),R.drawable.standstillr));
+                myFactory.getInstance().mainCharacterPictures.put("standStillL",BitmapFactory.decodeResource(getResources(),R.drawable.standstilll));
+
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture1D",BitmapFactory.decodeResource(getResources(),R.drawable.walk1d));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture1U",BitmapFactory.decodeResource(getResources(),R.drawable.walk1u));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture1R",BitmapFactory.decodeResource(getResources(),R.drawable.walk1r));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture1L",BitmapFactory.decodeResource(getResources(),R.drawable.walk1l));
+
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture2D",BitmapFactory.decodeResource(getResources(),R.drawable.walk2d));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture2U",BitmapFactory.decodeResource(getResources(),R.drawable.walk2u));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture2R",BitmapFactory.decodeResource(getResources(),R.drawable.walk2r));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture2L",BitmapFactory.decodeResource(getResources(),R.drawable.walk2l));
+
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture3D",BitmapFactory.decodeResource(getResources(),R.drawable.walk3d));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture3U",BitmapFactory.decodeResource(getResources(),R.drawable.walk3u));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture3R",BitmapFactory.decodeResource(getResources(),R.drawable.walk3r));
+                myFactory.getInstance().mainCharacterPictures.put("walkPicture3L",BitmapFactory.decodeResource(getResources(),R.drawable.walk3l));
+
+                myFactory.getInstance().evilMonster.put("standStillD",BitmapFactory.decodeResource(getResources(),R.drawable.emstandstilld));
+                myFactory.getInstance().evilMonster.put("standStillU",BitmapFactory.decodeResource(getResources(),R.drawable.emstandstillu));
+                myFactory.getInstance().evilMonster.put("standStillR",BitmapFactory.decodeResource(getResources(),R.drawable.emstandstillr));
+                myFactory.getInstance().evilMonster.put("standStillL",BitmapFactory.decodeResource(getResources(),R.drawable.emstandstilll));
+
+                myFactory.getInstance().evilMonster.put("walkPicture1D",BitmapFactory.decodeResource(getResources(),R.drawable.emwalk1d));
+                myFactory.getInstance().evilMonster.put("walkPicture1U",BitmapFactory.decodeResource(getResources(),R.drawable.emwalk1u));
+                myFactory.getInstance().evilMonster.put("walkPicture1R",BitmapFactory.decodeResource(getResources(),R.drawable.emwalk1r));
+                myFactory.getInstance().evilMonster.put("walkPicture1L",BitmapFactory.decodeResource(getResources(),R.drawable.emwalk1l));
+
+                myFactory.getInstance().evilMonster.put("walkPicture2D",BitmapFactory.decodeResource(getResources(),R.drawable.emwalk2d));
+                myFactory.getInstance().evilMonster.put("walkPicture2U",BitmapFactory.decodeResource(getResources(),R.drawable.emwalk2u));
+                myFactory.getInstance().evilMonster.put("walkPicture2R",BitmapFactory.decodeResource(getResources(),R.drawable.emwalk2r));
+                myFactory.getInstance().evilMonster.put("walkPicture2L",BitmapFactory.decodeResource(getResources(),R.drawable.emwalk2l));
+
+
+
+
                 myFactory.getInstance().resize();
 
             }
 
-    public void pickLevelMap(String name)
+    public void pickLevelMap(int name) //Executes when an item from the mapView is pressed. Based on the id we get the needed map from the DataBase
     {
+
+        Log.v("MainMenu","Picked map with id: "+ name);
+       pickedMapLevel = dungeonDartDBHandler.findMapById(name);
+
         //id = mapList.get(id).get_ID();
+     /*
         switch (name)
+
         {
             case "a":
             {
@@ -406,9 +592,11 @@ public class MainMenu extends Activity {
                 break;
             }
         }
+
+        */
     }
 
-    public void addAllMaps(LinkedList<ListInput> listInputs)
+    public void addAllMaps(LinkedList<ListInput> listInputs)  //Adds all map from the database to the mapList
     {
         mapList.clear();
         for(int i = 0;i<listInputs.size();i++)
@@ -418,7 +606,7 @@ public class MainMenu extends Activity {
         }
         mapView.setAdapter(new ListElementAdapter(MainMenu.this, mapList));
     }
-    public void add_map(ListInput listInput)
+    public void add_map(ListInput listInput)  //fills the listView with new content
     {
         mapList.add(listInput);
         mapView.setAdapter(new ListElementAdapter(MainMenu.this, mapList));

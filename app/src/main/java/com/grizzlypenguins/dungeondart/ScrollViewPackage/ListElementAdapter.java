@@ -1,6 +1,7 @@
 package com.grizzlypenguins.dungeondart.ScrollViewPackage;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,7 @@ public class ListElementAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return myList.get(position).get_ID();
     }
 
 
@@ -67,6 +68,7 @@ public class ListElementAdapter extends BaseAdapter {
             ListInput currentListData = getItem(position);
             mViewHolder.mapName.setText(currentListData.mapName);
             mViewHolder.mapScore.setText(currentListData.mapScore+"");
+            mViewHolder.num = currentListData.mapScore;
         }
         return convertView;
     }
@@ -75,24 +77,28 @@ public class ListElementAdapter extends BaseAdapter {
         TextView mapName, mapScore;
         int num=0;
         public MyViewHolder(View item, final int n) {
-            num = n;
+
             mapName = (TextView) item.findViewById(R.id.Text);
             mapScore = (TextView) item.findViewById(R.id.Time);
+           // num = Integer.parseInt(mapScore.getText().toString());
             item.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     try {
                         MainMenu temp = (MainMenu) context;
-                        if (temp != null) temp.pickLevelMap(mapName.getText().toString());
+
+                        if (temp != null) temp.pickLevelMap(num);
 
                     }
                     catch (Exception e)
                     {
+                        e.printStackTrace();
                         CreateMapActivity temp2 = (CreateMapActivity) context;
                         if(temp2!=null)
                         {
                             temp2.chooseTile(mapName.getText().toString());
+                            temp2.hideTileFragment();
                         }
                     }
 

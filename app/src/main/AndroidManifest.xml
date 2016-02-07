@@ -23,8 +23,7 @@
             android:name=".Activities.GamePlayActivity"
             android:label="@string/title_activity_game_play"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>
         <activity
             android:name=".Activities.How_to_Play"
@@ -35,9 +34,13 @@
         </activity>
         <activity
             android:name=".Activities.CreateMapActivity"
+            android:label="@string/title_activity_create_map"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:label="@string/title_activity_create_map" >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name=".Activities.DownloadMapsFromServerActivity"
+            android:label="@string/title_activity_download_maps_from_server" >
         </activity>
     </application>
 

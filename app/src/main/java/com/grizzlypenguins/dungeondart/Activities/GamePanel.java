@@ -14,6 +14,7 @@ import android.view.SurfaceView;
 
 import com.grizzlypenguins.dungeondart.Activities.uiScalingClasses.ScaleGamePlayActivity;
 import com.grizzlypenguins.dungeondart.GameLoop.MyGameLoop;
+import com.grizzlypenguins.dungeondart.GameLoop.VariableTimestepLoop;
 import com.grizzlypenguins.dungeondart.PackedLevel;
 import com.grizzlypenguins.dungeondart.PlayerScoring;
 import com.grizzlypenguins.dungeondart.R;
@@ -25,6 +26,7 @@ import javax.security.auth.callback.Callback;
 
 /**
  * Created by Darko on 22.11.2015.
+ * Connects the GamePLayActivity , the PackedLevel and the GameLoop
  */
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -33,7 +35,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     boolean runnable= false;
     float canvasZoom = 0;
     boolean gameFinished = false;
-
 
 
 
@@ -100,7 +101,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     {
 
         myGameLoop.setRunning(true);
-        myGameLoop.start();
+        myGameLoop.start();  //illegal state
         level.playerScoring.setStartTime(System.nanoTime()/1000000);
     }
 
@@ -123,7 +124,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         this.runnable = true;
     }
 
-    public void tick(){
+    public void tick(double delta){
         try {
             level.tick();
 

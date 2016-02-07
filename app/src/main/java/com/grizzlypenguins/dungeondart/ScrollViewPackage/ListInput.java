@@ -7,6 +7,7 @@ public class ListInput {
     String mapName;
     int mapScore;
     private int ID;
+
     public ListInput ( String mapName , int mapScore, int id)
     {
         this.ID = id;
@@ -24,10 +25,12 @@ public class ListInput {
         return mapName+"  "+ mapScore;
 
     }
+
     public int get_ID()
     {
         return ID;
     }
+
     public String getName()
     {
         return mapName;
