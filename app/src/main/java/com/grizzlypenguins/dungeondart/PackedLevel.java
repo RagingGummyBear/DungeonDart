@@ -42,6 +42,7 @@ public class PackedLevel implements Serializable {
         this.levelMap = levelMap;
         this.cameraControl = cameraControl;
         this.mainCharacter = mainCharacter;
+        mainCharacter.alive = true;
         this.torchLight = torchLight;
         this.evilMonster = evilMonster;
         playerScoring = new PlayerScoring();
@@ -53,7 +54,12 @@ public class PackedLevel implements Serializable {
    public void tick() throws Exception {
 
 
-        evilMonster.tick();
+        if(evilMonster.tick())
+        {
+            System.out.print("HELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLO");
+            mainCharacter.alive = false;
+            gameFinished = true;
+        }
         torchLight.tick();
         evilMonster.playerLocation = cameraControl.player_position;
 

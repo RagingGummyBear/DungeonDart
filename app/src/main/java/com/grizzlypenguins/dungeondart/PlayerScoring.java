@@ -12,6 +12,7 @@ public class PlayerScoring implements Serializable {
     int msec = 0;
     int sec = 0;
     int min = 0;
+    public boolean victory = true;
 
     public PlayerScoring ()
     {
@@ -61,6 +62,7 @@ public class PlayerScoring implements Serializable {
         }
         msec = (int) startTime;
         //Presmetka za kolku polinja se razdalecheni player i monster
+        if(!playerAlive) victory = false;
         score += (int)(torchHealth * 20*multiplyer);
         if(playerAlive) return score+powerUpBonus;
         score = 0;

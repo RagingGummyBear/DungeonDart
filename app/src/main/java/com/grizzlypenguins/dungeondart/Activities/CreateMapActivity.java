@@ -100,7 +100,7 @@ public class CreateMapActivity extends FragmentActivity {
         setContentView(R.layout.activity_create_map);
         initialize();
         set_listeners();
-        if(cameraControl.tiles[1][1]==null)
+        if(cameraControl ==null)
         Log.v("Creating map","The tiles are null");
         render(); //refreshes the drawing of the surfaceView
         timerHandler.postDelayed(timerRunnable, 500);
@@ -144,6 +144,9 @@ public class CreateMapActivity extends FragmentActivity {
         cameraControl = new CameraControl(cameraZoom,cameraZoom, myFactory.TILESIZE,new MyPoint((mapHeight/2)+10,(mapWidth/2)+10),1);
 
         cameraControl.tiles = levelMap.getShowingTiles(cameraControl.player_position);
+        Log.v("CreateMap","player_position:" + cameraControl.player_position.y  + "   " + cameraControl.player_position.x);
+
+
         if(cameraControl.tiles == null)
             Log.v("Creating map "," The tiles are null into the camera control : " + cameraControl.player_position.x + " y: "+cameraControl.player_position.y );
 

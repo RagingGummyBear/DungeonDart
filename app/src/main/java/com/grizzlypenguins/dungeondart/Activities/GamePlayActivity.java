@@ -53,7 +53,10 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
         public void run() {
 
             if(gamePanel.gameFinished)
+            {
+                System.out.println(" GAME FINISHED GAME FINISHED GAME FINISHED GAME FINISHED GAME FINISHED GAME FINISHED GAME FINISHED GAME FINISHED GAME FINISHED GAME FINISHED ");
                 change_Activity();
+            }
             timerHandler.postDelayed(this, 500);
         }
     };
@@ -67,6 +70,7 @@ public class GamePlayActivity extends Activity implements SensorEventListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game_play);
         Log.v("GamePlayActivity ", "    Started ");
+
         initialize();
         set_listeners();
         resizeLayouts();

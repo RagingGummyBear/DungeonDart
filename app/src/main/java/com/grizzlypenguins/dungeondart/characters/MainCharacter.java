@@ -24,7 +24,7 @@ public class MainCharacter implements Serializable {
     public int speed=1;
     public static MyPoint location = new MyPoint(0,0);
 
-    public boolean alive = false;
+    public boolean alive = true;
 
     public boolean stunned = false;
     public boolean slowed = false;

@@ -32,7 +32,7 @@ public class Difficulty implements Serializable {
             case 1:
             {
 
-                monsterSpeed = 7;
+                monsterSpeed = 10;
                 playerSpeed = 6;
                 multiplier = 1;  // no bonus points
                 torchDecrease = 0.35;
@@ -43,9 +43,9 @@ public class Difficulty implements Serializable {
             }
             case 2: {
 
-                monsterSpeed = 6;
+                monsterSpeed = 8;
                 playerSpeed = 6;
-                multiplier = 1.2;  //bonus 0.2% points
+                multiplier = 1.5;  //bonus 0.2% points
                 torchDecrease = 0.5;
                 torchLightLifeDecrease = (float) 4.5;
                 break;
@@ -53,9 +53,9 @@ public class Difficulty implements Serializable {
             }
             case 3: {
 
-                monsterSpeed = 5;
-                playerSpeed = 5;
-                multiplier = 1.5; //bonus 0.5% points
+                monsterSpeed = 6;
+                playerSpeed = 6;
+                multiplier = 2; //bonus 0.5% points
                 torchDecrease = 0.8;
                 torchLightLifeDecrease = (float) 4.5;
                 break;

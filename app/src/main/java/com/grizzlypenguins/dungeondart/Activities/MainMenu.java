@@ -222,6 +222,15 @@ public class MainMenu extends Activity {
         PlayerScoring playerScoring = (PlayerScoring) getIntent().getSerializableExtra("scoring");
         if(playerScoring!=null)  //We have finished the game and now we need to display the Information about the game that the user played.
         {
+            if(!playerScoring.victory) {
+                TextView temp = (TextView) findViewById(R.id.titleScoreScreen);
+                temp.setText("You Lost");
+            }
+            else
+            {
+                TextView temp = (TextView) findViewById(R.id.titleScoreScreen);
+                temp.setText("Victory!!");
+            }
             timePlayed.setText(playerScoring.getTime());
             scoredPoints.setText(String.format(playerScoring.score+""));
 

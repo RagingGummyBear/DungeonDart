@@ -111,11 +111,21 @@ public class EvilMonster implements Serializable{
 
                 }
                 move = 0;
-                return step();
+                return check();
             }
             move++;
-            return false;
+            return check();
 
+    }
+
+
+    private boolean check()
+    {
+        if(location.x == playerLocation.x && location.y == playerLocation.y)
+        {
+            return true;
+        }
+        else return false;
     }
 
 

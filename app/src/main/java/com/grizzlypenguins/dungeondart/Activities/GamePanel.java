@@ -196,6 +196,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     public void finishGame()
     {
+
         myGameLoop.setRunning(false);
         level.finishGame();
         gameFinished = true;

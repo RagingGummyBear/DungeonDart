@@ -56,7 +56,7 @@ public class AStar {
 
 			// check if our current Node location is the goal Node. If it is, we are done.
 			if(current.getX() == map.getGoalLocationX() && current.getY() == map.getGoalLocationY()) {
-				Log.v("search", "End");
+				//Log.v("search", "End");
 				return reconstructPath(current);
 			}
 

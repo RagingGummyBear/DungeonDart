@@ -11,7 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
+        android:visibility="invisible"
         android:id="@+id/firstScreen">
 
         <Button
@@ -156,7 +156,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/scoreScreenLayout"
-        android:visibility="invisible">
+        android:visibility="visible">
 
         <TextView
             android:textColor="#ffffff"

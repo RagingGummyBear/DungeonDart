@@ -216,7 +216,7 @@ public class LevelMap implements Serializable {
             for(int z=0;z<myFactory.TILENUMBER;z++)
             {
 
-                if(x+i<tiles.length-5 && y+z<tiles.length-5&& x+i >5 && y+z > 5) {
+                if(x+i<tiles.length-5 && y+z<tiles[0].length-5 && x+i >5 && y+z > 5) {
                    // tiles[x + i][y + z].monster = false;
                     temp[i][z] = this.tiles[x + i][y + z];
 
